@@ -1,0 +1,82 @@
+import heapq
+goal_state = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 0]
+]
+directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+def manhattan_distance(state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            value = state[i][j]
+            if value == 0:
+                continue
+            goal_x = (value - 1) // 3
+            goal_y = (value - 1) % 3
+            distance += abs(i - goal_x) + abs(j - goal_y)
+    return distance
+def get_neighbors(state):
+    neighbors = []
+    x, y = [(i, j) for i in range(3) for j in range(3) if state[i][j] == 0][0]
+    for dx, dy in directions:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append(new_state)
+    return neighbors
+def is_goal(state):
+    return state == goal_state
+def a_star(start_state):
+    visited = set()
+    heap = []
+    heapq.heappush(heap, (manhattan_distance(start_state), 0, start_state, []))
+    while heap:
+        f, g, state, path = heapq.heappop(heap)
+        state_tuple = tuple(tuple(row) for row in state)
+        if state_tuple in visited:
+            continue
+        visited.add(state_tuple)
+        if is_goal(state):
+            return path + [state]
+        for neighbor in get_neighbors(state):
+            if tuple(tuple(row) for row in neighbor) not in visited:
+                heapq.heappush(heap, (
+                    g + 1 + manhattan_distance(neighbor),
+                    g + 1,
+                    neighbor,
+                    path + [state]
+                ))
+    return None
+def print_state(state):
+    for row in state:
+        print(" ".join(str(x) if x != 0 else '_' for x in row))
+    print()
+start_state = [
+    [1, 2, 3],
+    [4, 0, 6],
+    [7, 5, 8]
+]
+solution = a_star(start_state)
+if solution:
+    print("Solution steps:")
+    for step in solution:
+        print_state(step)
+else:
+    print("No solution found.")
+
+//output
+
+Solution steps:
+1 2 3
+4 _ 6
+7 5 8
+
+1 2 3
+4 5 6
+7 _ 8
+
+1 2 3
+4 5 6
+7 8 _
