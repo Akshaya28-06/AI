@@ -1,0 +1,33 @@
+import itertools
+
+def solve_cryptarithmetic():
+    words = ["SEND", "MORE", "MONEY"]
+    unique_letters = set(''.join(words))
+    if len(unique_letters) > 10:
+        raise ValueError("Too many unique letters! Maximum is 10.")
+    unique_letters = list(unique_letters)
+    def word_to_number(word, letter_to_digit):
+        return int(''.join(str(letter_to_digit[c]) for c in word))
+    for perm in itertools.permutations(range(10), len(unique_letters)):
+        letter_to_digit = dict(zip(unique_letters, perm))
+        if any(letter_to_digit[word[0]] == 0 for word in words):
+            continue
+        send = word_to_number("SEND", letter_to_digit)
+        more = word_to_number("MORE", letter_to_digit)
+        money = word_to_number("MONEY", letter_to_digit)
+        if send + more == money:
+            print("Solution Found:")
+            for letter in sorted(letter_to_digit):
+                print(f"{letter} = {letter_to_digit[letter]}")
+            print(f"SEND + MORE = MONEY --> {send} + {more} = {money}")
+            return
+    print("No solution found.")
+
+# Run the solver
+solve_cryptarithmetic()
+
+//output
+            D = 7
+            E = 5
+            SEND + MORE = MONEY --> 9567 + 1085 = 10652
+
